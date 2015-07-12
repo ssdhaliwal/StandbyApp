@@ -1,0 +1,37 @@
+# of standby services		portlist
+# of available services		standbylist
+# of running services		activelist
+# of heartbeat sync time	secs
+
+startup:
+broadcast availability to all portlist
+collect responses to standbylist
+
+wait for all to return (or timeout)
+
+loop:
+send heartbeat to all every # times
+maintain standbylist
+
+take control:
+activelist empty:
+	lowest #
+		broadcast active control to all ports
+		all update activelist
+		start data logger service
+
+normal:
+others #
+	if no heartbeat in idle sync time
+		if activelist
+			clear activelist
+
+	next # in standbylist
+		broadcast reset to activelist
+		take control:
+
+reset:
+	shutdown datalogger services
+	set activelist to new #
+	broadcast availability
+	loop:
